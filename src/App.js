@@ -4,18 +4,18 @@ import Modal from "./components/Modal";
 
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { updateTotals } from "./features/cart/cartSlice";
+import { getCartItems, updateTotals } from "./features/cart/cartSlice";
 
 function App() {
   const dispatch = useDispatch();
-  let { cartItems } = useSelector((store) => {
+  let { cartItems, isLoading } = useSelector((store) => {
     return store.cart;
   });
+  let { isOpen } = useSelector((store) => store.modal);
 
-  let { isOpen } = useSelector((store) => {
-    return store.modal;
-  });
-
+  useEffect(() => {
+    dispatch(getCartItems());
+  }, []);
   useEffect(() => {
     dispatch(updateTotals());
   }, [cartItems]);
@@ -24,7 +24,13 @@ function App() {
     <div className="App">
       <Navbar></Navbar>
       {isOpen && <Modal />}
-      <CartContainer></CartContainer>
+      {!isLoading ? (
+        <CartContainer></CartContainer>
+      ) : (
+        <div className="loading">
+          <h1>Loading...</h1>
+        </div>
+      )}
     </div>
   );
 }
